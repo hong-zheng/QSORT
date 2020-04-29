@@ -1,0 +1,115 @@
+#include "SORT.h"
+void display(int arr[], int len){
+	for (int i = 0; i < len; i++){
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+void swap(int arr[], int start, int min){
+	int tmp = arr[start];
+	arr[start] = arr[min];
+	arr[min] = tmp;
+}
+// 快排 分治的思想，不断的进行切分
+
+int partiona(int* arr , int begin , int end){
+	int start = begin;
+	int key = arr[begin];
+	while (begin < end){
+		while (begin < end && key <= arr[end])
+			end--;
+		while (begin < end && key >= arr[begin])
+			begin++;
+		swap(arr, begin, end);
+	}
+	swap(arr, start, begin);
+}
+
+// hora划分
+int partion(int arr[], int begin, int end){
+	// 选择基准值
+	int start = begin;
+	int key = arr[begin];
+	// 划分
+	while (begin < end){
+		while (begin < end&&arr[begin] <= key){
+			begin++;
+		}
+		// 从后向前找到第一个小于key的位置
+		// 相等的时候也要移动，否则就大于key
+		while (begin < end && arr[end] >= key)
+			--end;
+		// 从前向后找第一个大于key的位置
+		// 相等时也要移动，否则会小于key
+
+		swap(arr, begin, end);
+	}
+	// key 和相遇位置的数据交换
+	swap(arr, start, begin);
+	return begin;
+}
+
+//挖坑法
+int partion2(int arr[], int begin, int end){
+	int key = arr[begin];
+	while (begin < end){
+		// 从后至前
+		while (begin < end && arr[begin] >= key){
+			--end;
+		}
+		arr[begin] = arr[end];
+		// 从前至后
+		while (begin < end && arr[begin] <= key){
+			arr[end] = arr[begin];
+		}
+	}
+	arr[begin] = key;
+	return begin;
+}
+// 前后指针法
+int partion3(int arr[], int begin, int end){
+	int prev= begin; //
+	int cur = prev + 1;
+	int key = arr[begin];
+	while (cur <= end){
+		// 新发现小数据和尾指针指向的位置不连续，则中间含有的大于基准值的数据，故进行交换
+		// 大数据向后哦移动，小数据向前移动
+		if (arr[cur] < key && (++prev != cur)){
+			swap(arr, prev, cur);
+			++cur;
+		}
+	}
+	swap(arr, begin, prev);
+	return prev;
+}
+void qsort(int arr[], int begin , int end){
+	if (begin >= end) return;
+	// 划分当前区间
+	// 划分之后的当前位置
+	int keyPos = partion(arr, begin, end);
+	// 划分子区间
+	qsort(arr, begin, keyPos - 1);
+	qsort(arr, keyPos+1,end );
+}
+void testsort(){
+	srand(time(NULL));
+	// 定义数据量
+	int num = 0;
+	scanf("%d", &num);
+	int* arr = (int*)malloc(sizeof(int)*num);
+	for (int i = 0; i < num; i++){
+		arr[i] = rand();
+	}
+	display(arr, num);
+	int begin = clock();
+	qsort(arr, 0,num-1);
+	int end = clock();
+	printf("最终排序为:>");
+	display(arr, num);
+	printf("堆排序所费时间为:>%d\n", end - begin);
+}
+int main(){
+	testsort();
+	system("pause");
+	return 0;
+}
